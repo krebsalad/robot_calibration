@@ -193,8 +193,11 @@ int main(int argc, char** argv)
       // Make sure sensor data is up to date after settling
       ros::Duration(0.1).sleep();
 
-      // Get pose of the features
-      bool found_all_features = true;
+     // Get pose of the features
+      bool found_all_features = true; 
+      bool atleast_one_feature = false; 
+      std::string failed_features = ""; //string to log failed features
+
       if (poses.size() == 0)
       {
         // In manual mode, we need to capture all features
@@ -208,6 +211,10 @@ int main(int argc, char** argv)
             found_all_features = false;
             break;
           }
+          else
+          {
+            atleast_one_feature = true;
+          }
         }
       }
       else
@@ -220,19 +227,31 @@ int main(int argc, char** argv)
           {
             ROS_WARN("%s failed to capture features.", feature.c_str());
             found_all_features = false;
-            break;
+            failed_features += feature + ", ";
+          }
+          else
+          {
+            atleast_one_feature = true;
           }
         }
       }
 
-      // Make sure we succeeded
-      if (found_all_features)
+      // Check if it is usefull to add this sample
+      if (atleast_one_feature)  
       {
+        if(found_all_features)
+        {
+          ROS_INFO("Found all features");
+        }
+        else
+        {
+          ROS_WARN("Failed capturing some features : %s.", failed_features.c_str());
+        }
         ROS_INFO("Captured pose %u", pose_idx);
       }
       else
       {
-        ROS_WARN("Failed to capture sample %u.", pose_idx);
+        ROS_WARN("Failed to capture all features : %s.", failed_features.c_str());
         continue;
       }
 

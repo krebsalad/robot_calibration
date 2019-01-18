@@ -67,6 +67,7 @@ private:
 
   std::string camera_sensor_name_;
   std::string chain_sensor_name_;
+  std::string checkerboard_frame_name_;
 };
 
 }  // namespace robot_calibration
